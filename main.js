@@ -93,10 +93,35 @@ window.addEventListener('load', function(){
             }
         }
     }
+    // ENEMY CLASS
     class Enemy{
-        constructor(){}
-        
+        constructor(game){
+            this.game = game;
+            this.x = this.game.width;
+            this.speedX = Math.random() * -1.5 - 0.5;
+            this.markedForDeletion = false;
+            
+        }
+        update(){
+            this.x += this.speedX;
+            if (this.x + this.width < 0) this.markedForDeletion = true;
+        } 
+        draw(context){
+        context.fillStyle = 'red';
+        context.fillRect(this.x, this.y, this.width, this.width);
+        }   
     }
+    class Angler1 extends Enemy {
+        constructor(game){
+            super(game);
+            this.width = 228 * 0.2;
+            this.height = 169 * 0.2;
+            this.y = Math.random() * (this.game.height * 0.9 - this.height)
+            
+        }    
+    }
+
+    // LAYER CLASS
     class Layer {
         constructor(){}
         
@@ -128,24 +153,52 @@ window.addEventListener('load', function(){
             this.input = new InputHandler(this);
             this.ui = new UI(this);
             this.keys = [];
+
+            this.enemies = [];
+            this.enemyTimer = 0;
+            this.enemyInterval = 1000;
+            
             this.ammo = 20;
             this.maxAmmo = 50;
-
             this.ammoTimer = 0;
             this.ammoInterval = 500;
+
         }
-        update(deltaTime){
-            this.player.update();
-            if (this.ammoTimer > this.ammoInterval){
-                if (this.ammo < this.maxAmmo) this.ammo++;
-                this.ammoTimer = 0;
-            } else {
-                this.ammoTimer += deltaTime;
-            }
+    update(deltaTime){
+        this.player.update();
+        // recharge ammo
+        if (this.ammoTimer > this.ammoInterval){
+            if (this.ammo < this.maxAmmo) this.ammo++;
+            this.ammoTimer = 0;
+        } else {
+            this.ammoTimer += deltaTime;
         }
-        draw(context){
-            this.player.draw(context);
-            this.ui.draw(context);
+        // enemies array update
+        this.enemies.forEach(enemy =>{
+            enemy.update();
+        });  
+        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);  
+        if (this.enemyTimer > this.enemyInterval && !this.gameOver){
+            this.addEnemy();
+            this.enemyTimer = 0;
+        } else {
+            this.enemyTimer += deltaTime;
+        }
+    }
+    draw(context){
+        this.player.draw(context);
+        this.ui.draw(context);
+        // enemies array draw
+        this.enemies.forEach(enemy =>{
+            enemy.draw(context);
+        });  
+        }
+        addEnemy(){
+            this.enemies.push(new Angler1(this));
+            /* console.log(this.enemies) */
+        }
+        checkCollision(rect1, rect2){
+            
         }
     }
 
