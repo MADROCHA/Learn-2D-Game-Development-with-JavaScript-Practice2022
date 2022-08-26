@@ -15,6 +15,8 @@ window.addEventListener('load', function(){
                         (e.key === 'a') 
                 ) && this.game.keys.indexOf(e.key) === -1){
                     this.game.keys.push(e.key); 
+                } else if ( e.key === ' '){
+                    this.game.player.shootTop();
                 }
                 console.log(this.game.keys);
                 /* console.log(e.key); */
@@ -28,7 +30,24 @@ window.addEventListener('load', function(){
         }
     }
     class Projectile {
-        constructor(){}
+        constructor(game, x, y){
+            this.game = game;
+            this.x = x;
+            this.y = y;
+            this.width = 10;
+            this.height = 3;
+            this.speed = 3;
+            this.markedForDeletion = false;
+        }
+        update(){
+            this.x += this.speed;
+            if (this.x > this.game.width * 0.8) this.markedForDeletion = true;
+
+        }
+        draw(context){
+            context.fillStyle = 'orange';
+            context.fillRect(this.x, this.y, this.width, this.height);
+        }
         
     }
     class Particle {
@@ -44,6 +63,7 @@ window.addEventListener('load', function(){
             this.y = 100;
             this.speedY = 0;
             this.maxSpeed = 2;
+            this.projectiles = [];
         }
         update(){
             // player controls
@@ -51,10 +71,22 @@ window.addEventListener('load', function(){
             else if (this.game.keys.includes('s')) this.speedY = this.maxSpeed;
             else this.speedY = 0;
             this.y += this.speedY;
+            // HANDLE PROJECTILES
+            this.projectiles.forEach(projectile => {
+                projectile.update();
+            });
+            this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion)
         }
         draw(context){
+            context.fillStyle = 'azure';
             context.fillRect(this.x, this.y, this.width, this.height);
-
+            this.projectiles.forEach(projectile => {
+                projectile.draw(context);
+            });
+        }
+        shootTop(){
+            this.projectiles.push(new Projectile(this.game, this.x, this.y));
+            console.log(this.projectiles);
         }
     }
     class Enemy{
