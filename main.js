@@ -128,7 +128,15 @@ window.addEventListener('load', function(){
 
     // LAYER CLASS
     class Layer {
-        constructor(){}
+        constructor(game,image,sppedModifier){
+            this.game = game;
+            this.image = image;
+            this.speedModifier = speedModifier;
+            this.width = 1768;
+            this.height = 500;
+            this.x = 0;
+            this.y = 0;
+        }
         
     }
     class Background {
