@@ -82,6 +82,16 @@ window.addEventListener('load', function(){
             else if (this.game.keys.includes('s')) this.speedY = this.maxSpeed;
             else this.speedY = 0;
             this.y += this.speedY;
+
+            // VERTICAL BOUNDARIES MAD 0.1
+            //bottom boundary
+            //if (this.y > this.game.height - this.height) this.y = this.game.height - this.height;
+            // top boundary
+            //else if (this.y < -this.height   ) this.y = this.game.height - this.height;
+            //else if (this.y < 0 ) this.y = 0 ;
+            // VERTICAL BOUNDARIES default
+            if (this.y > this.game.height - this.height * 0.5) this.y = this.game.height - this.height * 0.5;
+            else if (this.y < -this.height * 0.5) this.y = -this.height * 0.5;
             // HANDLE PROJECTILES
             this.projectiles.forEach(projectile => {
                 projectile.update();
@@ -151,6 +161,7 @@ window.addEventListener('load', function(){
             this.frameY = 0;
             this.maxFrame = 37;
             
+            
         }
         update(){
             this.x += this.speedX - this.game.speed;
@@ -207,6 +218,7 @@ window.addEventListener('load', function(){
             this.frameY = Math.floor(Math.random() * 2);
             this.lives = 3;
             this.score = 15;
+            this.type = 'lucky';
         }    
     }
     // LAYER CLASS
@@ -349,7 +361,7 @@ window.addEventListener('load', function(){
             enemy.update();
             if (this.checkCollision(this.player, enemy)){
                 enemy.markedForDeletion = true;
-                if(enemy.type = 'lucky') this.player.enterPowerUp();
+                if (enemy.type === 'lucky') this.player.enterPowerUp();
                 else this.score--;
             }
             this.player.projectiles.forEach(projectile => {
