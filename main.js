@@ -279,6 +279,21 @@ window.addEventListener('load', function(){
             this.speedX = Math.random() * -1.2 - 0.2;
         }    
     }
+    class Drone extends Enemy {
+        constructor(game, x ,y){
+            super(game);
+            this.width = 115;
+            this.height = 95;
+            this.x = x;
+            this.y = y;
+            this.image = document.getElementById('drone');
+            this.frameY = Math.floor(Math.random() * 2);
+            this.lives = 3;
+            this.score = this.lives;
+            this.type = 'drone';
+            this.speedX = Math.random() * -4.2 - 0.5;
+        }    
+    }
     // LAYER CLASS
     class Layer {
         constructor(game, image, speedModifier){
@@ -424,7 +439,7 @@ window.addEventListener('load', function(){
             if (this.checkCollision(this.player, enemy)){
                 enemy.markedForDeletion = true;
                 // particles loop; note: to make them appear after player collision with enemies.
-                for (let i = 0; i < 10; i++){
+                for (let i = 0; i < enemy.score; i++){
                     this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
                 }
                 if (enemy.type === 'lucky') this.player.enterPowerUp();
@@ -435,10 +450,16 @@ window.addEventListener('load', function(){
                     enemy.lives--;
                     projectile.markedForDeletion = true;
                     if (enemy.lives <= 0){
+                        // particles loop; note: to make them appear after reduce enemy lives to zero.
+                        for (let i = 0; i < enemy.score; i++){
+                            this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
+                        }
                         enemy.markedForDeletion = true;
                         // particles loop; note: to make them appear after reduce enemy lives to zero.
-                        for (let i = 0; i < 10; i++){
-                            this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
+                        if (enemy.type === 'hive'){
+                            for (let i = 0; i < 3; i++){
+                                this.enemies.push(new Drone(this, enemy.x + Math.random() * enemy.width, enemy.y + Math.random() * enemy.height * 0.5));
+                            }
                         }
                         if (!this.gameOver)this.score += enemy.score;
                         //check SCORE
