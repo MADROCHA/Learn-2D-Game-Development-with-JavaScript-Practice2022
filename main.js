@@ -55,7 +55,14 @@ window.addEventListener('load', function(){
         
     }
     class Particle {
-        constructor(){}
+        constructor(game, x ,y){
+            this.game = game;
+            //this.width = 120;
+            //this.height = 190;
+            this.x = x;
+            this.y = y;
+            this.image = document.getElementById('gears');
+        }
         
     }
     class Player {
