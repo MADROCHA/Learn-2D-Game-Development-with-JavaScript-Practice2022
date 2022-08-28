@@ -20,14 +20,14 @@ window.addEventListener('load', function(){
                 } else if ( e.key === '0'){
                     this.game.debug = !this.game.debug;
                 }
-                console.log(this.game.keys);
+                /* console.log(this.game.keys); */
                 /* console.log(e.key); */
             });
             window.addEventListener('keyup', e => {
                 if (this.game.keys.indexOf(e.key) > -1){
                     this.game.keys.splice(this.game.keys.indexOf(e.key), 1)
                 }
-                console.log(this.game.keys);
+                /* console.log(this.game.keys); */
             });
         }
     }
@@ -336,6 +336,53 @@ window.addEventListener('load', function(){
             
         }
     }
+
+    class Explosion {
+        constructor(game, x, y){
+            this.game = game;
+            this.frameX = 0;
+            this.spriteHeight = 200;
+            
+            this.fps = 20;
+            this.timer = 0;
+            this.interval = 1000/this.fps;
+            this.markedForDeletion = false;
+            this.maxFrame = 8;
+        }
+        update(deltaTime){
+            this.x -= this.game.speed;
+            if(this.timer > this.interval){
+                this.frameX++;
+                this.timer = 0;
+            } else {
+                this.timer += deltaTime;
+            }
+            if ( this.frameX > this.maxFrame) this.markedForDeletion = true;
+        }
+        draw(context){
+            context.drawImage(this.image, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+        }
+    }
+    class SmokeExplosion extends Explosion {
+        constructor(game, x, y){
+            super(game, x, y);
+            this.image = document.getElementById('smokeExplosion');
+            this.spriteWidth = 200;
+            this.width = this.spriteWidth;
+            this.height = this.spriteHeight;
+            this.x = x - this.width * 0.5;
+            this.y = y - this.height * 0.5;
+
+            
+        }
+    }
+    class FireExplosion extends Explosion {
+        constructor(game, x, y){
+            //this.spriteWidth = ;
+        }
+    }
+
+    
     class UI {
         constructor(game){
             this.game = game;
@@ -394,6 +441,7 @@ window.addEventListener('load', function(){
             
             this.keys = [];
             this.particles = [];
+            this.explosions = [];
 
             this.enemies = [];
             this.enemyTimer = 0;
@@ -433,11 +481,15 @@ window.addEventListener('load', function(){
         // particles array update
         this.particles.forEach(particle => particle.update());
         this.particles = this.particles.filter(particle => !particle.markedForDeletion);
+        // explosions array update
+        this.explosions.forEach(explosion => explosion.update(deltaTime));
+        this.explosions = this.explosions.filter(explosion => !explosion.markedForDeletion);
         // enemies array update
         this.enemies.forEach(enemy =>{
             enemy.update();
             if (this.checkCollision(this.player, enemy)){
                 enemy.markedForDeletion = true;
+                this.addExplosion(enemy);
                 // particles loop; note: to make them appear after player collision with enemies.
                 for (let i = 0; i < enemy.score; i++){
                     this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
@@ -455,6 +507,7 @@ window.addEventListener('load', function(){
                             this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
                         }
                         enemy.markedForDeletion = true;
+                        this.addExplosion(enemy);
                         // particles loop; note: to make them appear after reduce enemy lives to zero.
                         if (enemy.type === 'hive'){
                             for (let i = 0; i < 3; i++){
@@ -486,6 +539,9 @@ window.addEventListener('load', function(){
         this.enemies.forEach(enemy =>{
             enemy.draw(context);
         });  
+        this.explosions.forEach(explosion =>{
+            explosion.draw(context);
+        });  
         this.background.layer4.draw(context);
         }
         addEnemy(){
@@ -495,6 +551,11 @@ window.addEventListener('load', function(){
             else if (randomize < 0.8) this.enemies.push(new HiveWhale(this));
             else this.enemies.push(new LuckyFish(this));
             /* console.log(this.enemies) */
+        }
+        addExplosion(enemy){
+            const randomize = Math.random();
+            if (randomize < 1) this.explosions.push(new SmokeExplosion(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
+            /* console.log(this.explosions); */
         }
         checkCollision(rect1, rect2){
             return (
@@ -512,8 +573,8 @@ window.addEventListener('load', function(){
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp;
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        game.update(deltaTime);
         game.draw(ctx);
+        game.update(deltaTime);
         requestAnimationFrame(animate);
     }
     animate(0);
