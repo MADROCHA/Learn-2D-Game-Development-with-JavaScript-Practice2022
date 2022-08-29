@@ -342,12 +342,17 @@ window.addEventListener('load', function(){
             this.game = game;
             this.frameX = 0;
             this.spriteHeight = 200;
-            
+            this.spriteWidth = 200;
+            this.width = this.spriteWidth;
+            this.height = this.spriteHeight;
+            this.x = x - this.width * 0.5;
+            this.y = y - this.height * 0.5;
             this.fps = 20;
             this.timer = 0;
             this.interval = 1000/this.fps;
             this.markedForDeletion = false;
             this.maxFrame = 8;
+    
         }
         update(deltaTime){
             this.x -= this.game.speed;
@@ -366,19 +371,15 @@ window.addEventListener('load', function(){
     class SmokeExplosion extends Explosion {
         constructor(game, x, y){
             super(game, x, y);
-            this.image = document.getElementById('smokeExplosion');
-            this.spriteWidth = 200;
-            this.width = this.spriteWidth;
-            this.height = this.spriteHeight;
-            this.x = x - this.width * 0.5;
-            this.y = y - this.height * 0.5;
-
-            
+            this.image = document.getElementById('smokeExplosion');        
         }
     }
     class FireExplosion extends Explosion {
-        constructor(game, x, y){
+        
             //this.spriteWidth = ;
+            constructor(game, x, y){
+                super(game, x, y);
+                this.image = document.getElementById('fireExplosion');                        
         }
     }
 
@@ -554,7 +555,11 @@ window.addEventListener('load', function(){
         }
         addExplosion(enemy){
             const randomize = Math.random();
-            if (randomize < 1) this.explosions.push(new SmokeExplosion(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
+            if (randomize < 0.5) {
+                this.explosions.push(new SmokeExplosion(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
+            } else {
+                this.explosions.push(new FireExplosion(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
+            }
             /* console.log(this.explosions); */
         }
         checkCollision(rect1, rect2){
