@@ -2,7 +2,7 @@ window.addEventListener('load', function(){
     // canvas setup
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
-    canvas.width = 700;
+    canvas.width = 1000;
     canvas.height = 500;
 
     class InputHandler {
@@ -451,17 +451,17 @@ window.addEventListener('load', function(){
             this.ammo = 20;
             this.maxAmmo = 50;
             this.ammoTimer = 0;
-            this.ammoInterval = 500;
+            this.ammoInterval = 450;
 
             this.gameOver = false;
             this.score = 0;
-            this.winningScore = 20;
+            this.winningScore = 60;
 
             this.gameTime = 0;
-            this.timeLimit = 30000;
+            this.timeLimit = 20000;
 
             this.speed = 1; 
-            this.debug = true;
+            this.debug = false;
 
 
 
@@ -496,7 +496,7 @@ window.addEventListener('load', function(){
                     this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
                 }
                 if (enemy.type === 'lucky') this.player.enterPowerUp();
-                else this.score--;
+                else if (!this.gameOver) this.score--;
             }
             this.player.projectiles.forEach(projectile => {
                 if (this.checkCollision(projectile, enemy)){
@@ -517,7 +517,8 @@ window.addEventListener('load', function(){
                         }
                         if (!this.gameOver)this.score += enemy.score;
                         //check SCORE
-                        if (this.score > this.winningScore) this.gameOver = true;
+                        /* if (this.score > this.winningScore) this.gameOver = true; */
+
                     }
                 }
             })
@@ -549,7 +550,7 @@ window.addEventListener('load', function(){
             const randomize = Math.random();
             if (randomize < 0.3) this.enemies.push(new Angler1(this));
             else if (randomize < 0.6) this.enemies.push(new Angler2(this));
-            else if (randomize < 0.8) this.enemies.push(new HiveWhale(this));
+            else if (randomize < 0.7) this.enemies.push(new HiveWhale(this));
             else this.enemies.push(new LuckyFish(this));
             /* console.log(this.enemies) */
         }
